@@ -7,7 +7,6 @@ $mysql = array(	'host' => 'localhost',
 				'password' => 'tralala');
 
 $project_title = 'Issue Tracker';
-$project_slogun = 'Stay Stable';
 
 $issues_states = array(	'0' => 'New',
 						'1' => 'Open',
