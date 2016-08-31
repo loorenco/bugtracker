@@ -54,7 +54,17 @@ h1 {
     display: inline-block;
 }
   </style>
-  
+  <script>
+  $(function() {
+	  $(document).on('click', '#signUp .btn-primary', function(e){
+		  if($('#signUp #inputFirstName').lenth < 3){
+			  $('#signUp #inputFirstName').parent().parent().removeClass('has-success has-feedback').addClass('has-error has-feedback');
+		  } else {
+			  $('#signUp #inputFirstName').parent().parent().removeClass('has-error has-feedback').addClass('has-success has-feedback');
+		  }
+	  })
+  })
+  </script>
 </head>
 
 <body>
