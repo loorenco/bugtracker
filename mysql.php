@@ -3,7 +3,7 @@ global $mysql;
 
 $conn = mysqli_connect($mysql['host'], $mysql['user'], $mysql['password'], $mysql['db']);
 
-function query($query){
+function query($query, $show_errors = false){
 	global $conn;
 	$result = mysqli_query($conn, $query);
 	$return = array();
@@ -14,9 +14,14 @@ function query($query){
 		}
 		mysqli_free_result($result);
 		return $return;
+	} elseif((false === strpos($query, 'SELECT')) && mysqli_affected_rows($conn) > 0){
 		return mysqli_affected_rows($conn);
-	} else {
+	} elseif(!$show_errors) {
 		return false;
+	} elseif (mysqli_connect_errno()) {
+		return "Failed to connect to MySQL: " . mysqli_connect_error();
+	} else {
+		return "Error description: " . mysqli_error($conn);
 	}
 }
 ?>
