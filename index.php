@@ -34,18 +34,8 @@ body,html{overflow-x:hidden}body{padding:60px 20px 0}footer{border-top:1px solid
     margin: auto;
     display: table;
 }
-.input-group {
-   // display: inline-table;
-   // vertical-align: bottom;
-}
 .mb10 {
 	margin-bottom: 10px;
-}
-.left {
-	//float: left;
-}
-.right {
-	//float: right;
 }
 .table-filter {
 	background: #eeeeee;
@@ -411,7 +401,7 @@ h1 {
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr class="accordion-toggle" data-toggle="collapse" data-parent=".table-striped" href="#collapseOnePanel" aria-expanded="false">
                   <td>1</td>
                   <td>bug 1</td>
                   <td>admin</td>
@@ -424,6 +414,11 @@ h1 {
 					<a data-toggle="modal" href="#deleteIssue" class="btn btn-warning btn-sm">Delete</a>
 				  </td>
                 </tr>
+				<tr id="collapseOnePanel" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+              <td colspan="6" class="panel-body">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. 
+              </td>
+            </tr>
 				<tr>
                   <td>2</td>
                   <td>bug 2</td>

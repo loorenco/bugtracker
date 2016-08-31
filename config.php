@@ -1,10 +1,10 @@
 <?php 
 global $mysql;
 
-$mysql = array(	'host' => 'localhost',
-				'db' => 'bug_tracker',
-				'user' => 'loorenco',
-				'password' => 'tralala');
+$mysql = array(	'host' => 'db4free.net',
+				'db' => 'xpoldecl_bug',
+				'user' => 'xpoldecl_bug',
+				'password' => 'Alabala1');
 
 $project_title = 'Issue Tracker';
 
