@@ -21,6 +21,8 @@ function query($query, $show_errors = false){
 		}
 		mysqli_free_result($result);
 		return $return;
+	} elseif((0 === strpos($query, 'INSERT')) && mysqli_affected_rows($conn) > 0){
+		return mysqli_insert_id($conn);
 	} elseif((false === strpos($query, 'SELECT')) && mysqli_affected_rows($conn) > 0){
 		return mysqli_affected_rows($conn);
 	} elseif(!$show_errors) {

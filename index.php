@@ -2,6 +2,7 @@
 session_start();
 include('config.php');
 include('mysql.php');
+include('functions.php');
 global $conn;
 ?><!DOCTYPE html>
 <html lang="en">
@@ -58,6 +59,9 @@ body,html{overflow-x:hidden}body{padding:60px 20px 0}footer{border-top:1px solid
 h1 {
     display: inline-block;
 }
+.accordion-toggle {
+	cursor: pointer;
+}
 <?php if(isset($_SESSION['loged'])) { ?>
 .not_loged_btn {
 	display: none;
@@ -85,7 +89,7 @@ h1 {
 		<a data-toggle="modal" href="#signUp" class="btn btn-primary mb10 not_loged_btn">Sign Up</a>
 
 		<a data-toggle="modal" href="#newIssue" class="btn btn-primary mb10 loged_btn">New Issue</a>
-		<a data-toggle="modal" href="#profile" class="btn btn-primary mb10 loged_btn">Profile</a>
+		<a data-toggle="modal" href="#profile" class="btn btn-primary mb10 loged_btn user_info">Profile</a>
 		<a data-toggle="modal" href="#signOut" class="btn btn-primary mb10 loged_btn">Sign Out</a>
 	</h1></div>
 </div>
@@ -142,10 +146,9 @@ h1 {
 						<label for="inputState" class="col-lg-2 control-label">State</label>
 						<div class="col-lg-10">
 						  <select class="form-control" name="inputState" id="inputState">
-							<option>New</option>
-							<option>Open</option>
-							<option>Fixed</option>
-							<option>Closed</option>
+							<?php foreach($issues_states as $key => $value) {
+								echo '<option value="'.$key.'">'.$value.'</option>';
+							} ?>
 						  </select>
 						</div>
 					  </div>
@@ -185,10 +188,9 @@ h1 {
 						<label for="inputState" class="col-lg-2 control-label">State</label>
 						<div class="col-lg-10">
 						  <select class="form-control" name="inputState" id="inputState">
-							<option>New</option>
-							<option>Open</option>
-							<option>Fixed</option>
-							<option>Closed</option>
+							<?php foreach($issues_states as $key => $value) {
+								echo '<option value="'.$key.'">'.$value.'</option>';
+							} ?>
 						  </select>
 						</div>
 					  </div>
@@ -389,7 +391,7 @@ h1 {
 		
 		<div class="col-sm-6 col-lg-6">
 		<div class="input-group">
-              <input type="text" class="form-control" placeholder="Search">
+              <input type="text" class="search form-control" placeholder="Search">
               <span class="input-group-btn">
                 <button class="btn btn-default" type="button">Go!</button>
               </span>
@@ -408,67 +410,34 @@ h1 {
                 </tr>
               </thead>
               <tbody>
-                <tr class="accordion-toggle" data-toggle="collapse" data-parent=".table-striped" href="#collapseOnePanel" aria-expanded="false">
-                  <td>1</td>
-                  <td>bug 1</td>
-                  <td>admin</td>
-                  <td>
-					<span class="label label-info pull-left" data-effect="pop">New</span>
-				  </td>
-                  <td>25 Mar 2016 16:40</td>
-                  <td class="loged_td">
-					<a data-toggle="modal" href="#editIssue" class="btn btn-primary btn-sm">Edit</a>
-					<a data-toggle="modal" href="#deleteIssue" class="btn btn-warning btn-sm">Delete</a>
-				  </td>
-                </tr>
-				<tr id="collapseOnePanel" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-              <td colspan="6" class="panel-body">
-                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. 
-              </td>
-            </tr>
-				<tr>
-                  <td>2</td>
-                  <td>bug 2</td>
-                  <td>admin</td>
-                  <td>
-					<span class="label label-warning pull-left" data-effect="pop">Open</span>
-				  </td>
-                  <td>25 Mar 2016 16:40</td>
-                  <td>
-					<a class="btn btn-primary btn-sm" href="#">Edit</a>
-					<a class="btn btn-warning btn-sm" href="#">Delete</a>
-				  </td>
-                </tr>
-				<tr>
-                  <td>3</td>
-                  <td>bug 3</td>
-                  <td>admin</td>
-                  <td>
-					<span class="label label-success pull-left" data-effect="pop">Fixed</span>
-				  </td>
-                  <td>25 Mar 2016 16:40</td>
-                  <td>
-					<a class="btn btn-primary btn-sm" href="#">Edit</a>
-					<a class="btn btn-warning btn-sm" href="#">Delete</a>
-				  </td>
-                </tr>
-				<tr>
-                  <td>4</td>
-                  <td>bug 4</td>
-                  <td>admin</td>
-                  <td>
-					<span class="label label-default pull-left" data-effect="pop">Closed</span>
-				  </td>
-                  <td>25 Mar 2016 16:40</td>
-                  <td>
-					<a class="btn btn-primary btn-sm" href="#">Edit</a>
-					<a class="btn btn-warning btn-sm" href="#">Delete</a>
-				  </td>
-                </tr>
+			  <?php
+			  		$bugs = query("SELECT * FROM `bugs` ORDER BY `id` DESC");
+					foreach($bugs as $bug){
+						$user = query("SELECT * FROM `users` WHERE `id` = '".$bug['author']."'");
+						$author = $user['0']['first_name'].' '.$user['0']['last_name'];
+						echo '<tr class="bug-'.$bug['id'].'">
+						  <td>'.$bug['id'].'</td>
+						  <td class="b_title accordion-toggle" data-toggle="collapse" data-parent=".table-striped" href="#collapseOnePanel'.$bug['id'].'" aria-expanded="false">'.$bug['title'].'</td>
+						  <td class="author">'.$author.'</td>
+						  <td>
+							<span data-id="'.$bug['state'].'" class="b_state label label-'.state_to_style($bug['state']).' pull-left" data-effect="pop">'.$issues_states[$bug['state']].'</span>
+						  </td>
+						  <td>'.date('d M Y h:i', $bug['date']).'</td>
+						  <td class="loged_td">
+							<a data-toggle="modal" data-id="'.$bug['id'].'" href="#editIssue" class="edit_bug_info btn btn-primary btn-sm">Edit</a>
+							<a data-toggle="modal" data-id="'.$bug['id'].'" href="#deleteIssue" class="del_bug btn btn-warning btn-sm">Delete</a>
+						  </td>
+						</tr>
+						<tr id="collapseOnePanel'.$bug['id'].'" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+						  <td colspan="6" class="panel-body">'.$bug['description'].'</td>
+						</tr>';
+					}
+			  ?>
+
                 
               </tbody>
             </table>
-			<div class="col-sm-12 col-lg-12">
+			<!--<div class="col-sm-12 col-lg-12">
 	<ul class="pagination">
           <li><a href="#">«</a></li>
           <li class="active"><a href="#">1</a></li>
@@ -478,7 +447,7 @@ h1 {
           <li><a href="#">5</a></li>
           <li class="disabled"><a href="#">»</a></li>
         </ul>
-      </div>
+      </div>-->
       </div>
     </div>
 
@@ -502,6 +471,7 @@ h1 {
   <!-- Main Scripts-->
   <script src="assets/js/jquery.js"></script>
   <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/md5.js"></script>
   
   <!-- Bootstrap 3 has typeahead optionally
   <script src="assets/js/typeahead.min.js"></script> -->
@@ -511,6 +481,13 @@ h1 {
 	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	return regex.test(email);
   }
+  var delay = (function() {
+    var timer = 0;
+    return function(callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
   $(function() {
 	  $(document).on('click', '#signUp .btn-primary', function(e){
 		  var error = false;
@@ -545,7 +522,7 @@ h1 {
 			  $('#signUp #inputPassword2').parent().parent().removeClass('has-error').addClass('has-success');
 		  }
 		  if(!error){
-			$.post(url+'ajax.php?mode=sign_up',$(document).find('#signUp input').serialize(), function(data) {
+			$.post(url+'ajax.php?mode=sign_up',$(document).find('#signUp input:not(#inputPassword, #inputPassword2)').serialize()+'&inputPassword='+md5($('#signUp #inputPassword').val()), function(data) {
 				if(data == 'success'){
 					$('.loged_btn').css('display','inline-block');
 					$('.loged_td').css('display','table-cell');
@@ -561,8 +538,113 @@ h1 {
 			$('#signUp .has-error:first').find('input').focus();
 		  }
 	  })
+	  $(document).on('click', '#profile .btn-primary', function(e){
+		  var error = false;
+		  if($('#profile #inputFirstName').val().length < 3){
+			  $('#profile #inputFirstName').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#profile #inputFirstName').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if($('#profile #inputLastName').val().length < 3){
+			  $('#profile #inputLastName').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#profile #inputLastName').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if($('#profile #inputCurrentPassword').val().length < 3){
+			  $('#profile #inputCurrentPassword').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#profile #inputCurrentPassword').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if(!isEmail($('#profile #inputEmail').val())){
+			  $('#profile #inputEmail').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#profile #inputEmail').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if(($('#profile #inputNewPassword').val() != '' ) && ($('#profile #inputNewPassword').val().length < 3 || $('#profile #inputNewPassword').val() != $('#profile #inputNewPassword2').val())){
+			  $('#profile #inputNewPassword').parent().parent().removeClass('has-success').addClass('has-error');
+			  $('#profile #inputNewPassword2').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#profile #inputNewPassword').parent().parent().removeClass('has-error').addClass('has-success');
+			  $('#profile #inputNewPassword2').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if(!error){
+			$.post(url+'ajax.php?mode=edit_prodile',$(document).find('#profile input:not(#inputCurrentPassword, #inputNewPassword, #inputNewPassword2)').serialize()+'&inputCurrentPassword='+md5($('#profile #inputCurrentPassword').val())+'&inputNewPassword='+md5($('#profile #inputNewPassword').val()), function(data) {
+				if(data == 'success'){
+					$('#profile .btn-default').click();
+				} else {
+					$('#profile #inputCurrentPassword').parent().parent().removeClass('has-success').addClass('has-error');
+					$('#profile .has-error:first').find('input').focus();
+				}
+			})
+		  } else {
+			$('#signUp .has-error:first').find('input').focus();
+		  }
+	  })
+	  $(document).on('click', '#newIssue .btn-primary', function(e){
+		  var error = false;
+		  if($('#newIssue #inputTitle').val().length < 3){
+			  $('#newIssue #inputTitle').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#newIssue #inputTitle').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if($('#newIssue #inputDescription').val().length < 3){
+			  $('#newIssue #inputDescription').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#newIssue #inputDescription').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+
+		  if(!error){
+			$.post(url+'ajax.php?mode=add_bug',$(document).find('#newIssue input, #newIssue select, #newIssue textarea').serialize(), function(data) {
+				$('.table-striped tbody').prepend(data);
+				$('#newIssue .btn-default').click();
+				$('#newIssue #inputTitle').val('');
+				$('#newIssue #inputState').val('0');
+				$('#newIssue #inputDescription').val('');
+			})
+		  } else {
+			$('#newIssue .has-error:first').find('input').focus();
+		  }
+	  })
+	  $(document).on('click', '#editIssue .btn-primary', function(e){
+		  var id = $(this).data('id');
+		  var author = $('.bug-'+id).find('.author').text();
+		  var $emel = $('.bug-'+id);
+		  var error = false;
+		  if($('#editIssue #inputTitle').val().length < 3){
+			  $('#editIssue #inputTitle').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#editIssue #inputTitle').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+		  if($('#editIssue #inputDescription').val().length < 3){
+			  $('#editIssue #inputDescription').parent().parent().removeClass('has-success').addClass('has-error');
+			  error = true;
+		  } else {
+			  $('#editIssue #inputDescription').parent().parent().removeClass('has-error').addClass('has-success');
+		  }
+
+		  if(!error){
+			$.post(url+'ajax.php?mode=edit_bug','author='+author+'&id='+id+'&'+$(document).find('#editIssue input, #editIssue select, #editIssue textarea').serialize(), function(data) {
+				$emel.after(data);
+				$emel.remove();
+				$('#editIssue .btn-default').click();
+				$('#editIssue #inputTitle').val('');
+				$('#editIssue #inputState').val('0');
+				$('#editIssue #inputDescription').val('');
+			})
+		  } else {
+			$('#editIssue .has-error:first').find('input').focus();
+		  }
+	  })
 	  $(document).on('click', '#signIn .btn-primary', function(e){
-		$.post(url+'ajax.php?mode=sign_in',$(document).find('#signIn input').serialize(), function(data) {
+		$.post(url+'ajax.php?mode=sign_in',$(document).find('#signIn input:not(#inputPassword)').serialize()+'&inputPassword='+md5($('#signIn #inputPassword').val()), function(data) {
 			if(data == 'success'){
 				$('.loged_btn').css('display','inline-block');
 				$('.loged_td').css('display','table-cell');
@@ -581,6 +663,71 @@ h1 {
 		$('.loged_td').css('display','none');
 		$('.not_loged_btn').css('display','inline-block');
 		$('#signOut .btn-default').click();
+	  })
+	  $(document).on('click', '.user_info', function(e){
+		$.post(url+'ajax.php?mode=user_info', function(data) {
+			data = $.parseJSON(data);
+			$('#profile #inputFirstName').val(data.first_name)
+			$('#profile #inputLastName').val(data.last_name)
+			$('#profile #inputEmail').val(data.email)
+			$('#profile #inputCurrentPassword').val('');
+			$('#profile #inputNewPassword').val('');
+			$('#profile #inputNewPassword2').val('');
+		})
+	  })
+	  $(document).on('click', '.edit_bug_info', function(e){
+		  $('#editIssue .btn-primary').data('id', $(this).data('id'));
+			var desc = $('#collapseOnePanel'+$(this).data('id')).children().text();
+			var title = $(this).parent().parent().find('.b_title').text();
+			var state = $(this).parent().parent().find('.b_state').data('id');
+			$('#editIssue #inputTitle').val(title);
+			$('#editIssue #inputState').val('0');
+			$('#editIssue #inputDescription').val(desc);
+	  })
+	  $(document).on('click', '.del_bug', function(e){
+		  $('#deleteIssue .btn-primary').data('id', $(this).data('id'));
+	  })
+	  $(document).on('click', '#deleteIssue .btn-primary', function(e){
+		var id = $(this).data('id');
+		$('.bug-'+id).remove();
+		$.post(url+'ajax.php?mode=delete_bug', {'id': id});
+		$('#deleteIssue .btn-default').click();
+	  })
+	  $(document).on('change', 'input[type="checkbox"]', function(e){
+		$('.table-striped tbody .panel-collapse').removeClass('in').attr('aria-expanded', 'false').attr('style', '');
+		var states = [];
+		var search = $('.search').val();
+		$('input[type="checkbox"]:checked').each(function(e){
+			states.push($(this).parent().text().trim());
+		})
+		$('.table-striped tbody tr:not(.panel-collapse)').each(function(e){
+			if(states.indexOf($(this).find('.b_state').text().trim()) === -1  && (search.length > 3 && ($(this).find('.author').text().trim().includes(search) || $(this).find('.b_title').text().trim().includes(search))) ){
+				$(this).css('display', 'table-row');
+			} else if(states.indexOf($(this).find('.b_state').text().trim()) === -1  && search.length <= 3) {
+				$(this).css('display', 'table-row');
+			} else {
+				$(this).css('display', 'none');
+			}
+		})
+	  })
+	  $(document).on('keyup cut paste', '.search', function(e){
+		  delay(function(){
+		$('.table-striped tbody .panel-collapse').removeClass('in').attr('aria-expanded', 'false').attr('style', '');
+		var states = [];
+		var search = $('.search').val();
+		$('input[type="checkbox"]:checked').each(function(e){
+			states.push($(this).parent().text().trim());
+		})
+		$('.table-striped tbody tr:not(.panel-collapse)').each(function(e){
+			if(states.indexOf($(this).find('.b_state').text().trim()) === -1  && (search.length > 3 && ($(this).find('.author').text().trim().includes(search) || $(this).find('.b_title').text().trim().includes(search))) ){
+				$(this).css('display', 'table-row');
+			} else if(states.indexOf($(this).find('.b_state').text().trim()) === -1  && search.length <= 3) {
+				$(this).css('display', 'table-row');
+			} else {
+				$(this).css('display', 'none');
+			}
+		})
+		}, 500);
 	  })
   })
   </script>
