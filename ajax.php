@@ -44,20 +44,20 @@ if(isset($_SESSION['loged'])){
 				`state` = '".$state."'
 				WHERE `id` = '".$id."'");
 		$author = POST('author');
-		echo '<tr class="bug-'.$bug.'">
-		  <td>'.$bug.'</td>
-		  <td class="b_title accordion-toggle" data-toggle="collapse" data-parent=".table-striped" href="#collapseOnePanel'.$bug.'" aria-expanded="false">'.$title.'</td>
+		echo '<tr class="bug-'.$id.'">
+		  <td>'.$id.'</td>
+		  <td class="b_title accordion-toggle" data-toggle="collapse" data-parent=".table-striped" href="#collapseOnePanel'.$id.'" aria-expanded="false">'.$title.'</td>
 		  <td class="author">'.$author.'</td>
 		  <td>
 			<span data-id="'.$state.'" class="b_state label label-'.state_to_style($state).' pull-left" data-effect="pop">'.$issues_states[$state].'</span>
 		  </td>
 		  <td>'.date('d M Y h:i', $time).'</td>
 		  <td class="loged_td">
-			<a data-toggle="modal" data-id="'.$bug.'" href="#editIssue" class="edit_bug_info btn btn-primary btn-sm">Edit</a>
-			<a data-toggle="modal" data-id="'.$bug.'" href="#deleteIssue" class="del_bug btn btn-warning btn-sm">Delete</a>
+			<a data-toggle="modal" data-id="'.$id.'" href="#editIssue" class="edit_bug_info btn btn-primary btn-sm">Edit</a>
+			<a data-toggle="modal" data-id="'.$id.'" href="#deleteIssue" class="del_bug btn btn-warning btn-sm">Delete</a>
 		  </td>
 		</tr>
-		<tr id="collapseOnePanel'.$bug.'" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+		<tr id="collapseOnePanel'.$id.'" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
 		  <td colspan="6" class="panel-body">'.$description.'</td>
 		</tr>';
 	} else if($mode == 'delete_bug'){

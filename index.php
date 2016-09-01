@@ -681,7 +681,7 @@ h1 {
 			var title = $(this).parent().parent().find('.b_title').text();
 			var state = $(this).parent().parent().find('.b_state').data('id');
 			$('#editIssue #inputTitle').val(title);
-			$('#editIssue #inputState').val('0');
+			$('#editIssue #inputState').val(state);
 			$('#editIssue #inputDescription').val(desc);
 	  })
 	  $(document).on('click', '.del_bug', function(e){
